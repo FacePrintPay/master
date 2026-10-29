@@ -1,24 +1,1305 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>master | Constellation25 Sovereign Build</title>
-    <style>
-        body { font-family: 'Courier New', monospace; background: #0d0d0d; color: #00ff00; text-align: center; padding: 40px; margin: 0; }
-        h1 { text-shadow: 0 0 10px #00ff00; font-size: 2.5rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; color: #ccc; }
-        .badge { background: #003300; border: 1px solid #00ff00; padding: 10px 20px; border-radius: 5px; display: inline-block; margin-top: 20px; font-weight: bold; }
-        a { color: #00ff00; text-decoration: none; border-bottom: 1px dashed #00ff00; }
-        footer { margin-top: 50px; font-size: 0.8rem; opacity: 0.6; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C25 GAMMA v2.0 — Constellation-25</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+:root {
+--green: #00ff88;
+--cyan: #00e5ff;
+--purple: #c084fc;
+--pink: #f472b6;
+--dark: #020c18;
+--card: #0a1628;
+--border: #0e2a4a;
+--text: #94a3b8;
+--mono: 'Share Tech Mono', monospace;
+--head: 'Orbitron', monospace;
+--body: 'Rajdhani', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+background: var(--dark);
+color: #e2e8f0;
+font-family: var(--body);
+min-height: 100vh;
+overflow-x: hidden;
+}
+#stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.star {
+position: absolute;
+width: 2px; height: 2px;
+background: white;
+border-radius: 50%;
+animation: twinkle var(--d, 3s) var(--delay, 0s) infinite alternate;
+opacity: var(--o, 0.5);
+}
+@keyframes twinkle { from { opacity: var(--o, 0.5); } to { opacity: 0.1; } }
+nav {
+position: sticky; top: 0; z-index: 100;
+display: flex; align-items: center; justify-content: space-between;
+padding: 12px 20px;
+background: rgba(2,12,24,0.92);
+backdrop-filter: blur(12px);
+border-bottom: 1px solid var(--border);
+}
+.nav-brand { font-family: var(--head); font-size: 14px; font-weight: 700; }
+.nav-brand span:first-child { color: var(--green); }
+.nav-brand span:nth-child(2) { color: white; margin: 0 4px; }
+.nav-brand span:last-child { color: var(--text); font-size: 11px; }
+.nav-right { display: flex; gap: 8px; align-items: center; }
+.btn-nav {
+padding: 6px 14px; border-radius: 6px; font-family: var(--mono);
+font-size: 11px; cursor: pointer; border: 1px solid;
+transition: all 0.2s; font-weight: 700; letter-spacing: 1px;
+}
+.btn-swarm { background: transparent; border-color: var(--cyan); color: var(--cyan); }
+.btn-swarm:hover { background: var(--cyan); color: var(--dark); }
+.btn-offline { background: transparent; border-color: #ef4444; color: #ef4444; display: flex; align-items: center; gap: 6px; }
+.btn-offline.online { border-color: var(--green); color: var(--green); }
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+.tab-bar {
+display: flex; gap: 4px; padding: 0 20px;
+background: rgba(2,12,24,0.8);
+border-bottom: 1px solid var(--border);
+position: sticky; top: 53px; z-index: 99;
+backdrop-filter: blur(8px);
+}
+.tab {
+padding: 12px 16px; font-family: var(--mono); font-size: 11px;
+cursor: pointer; border: none; background: transparent;
+color: var(--text); border-bottom: 2px solid transparent;
+transition: all 0.2s; letter-spacing: 1px; display: flex; align-items: center; gap: 6px;
+}
+.tab:hover { color: white; }
+.tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+.panel { display: none; position: relative; z-index: 1; }
+.panel.active { display: block; }
+.hero {
+padding: 60px 20px 40px;
+text-align: center;
+}
+.hero-badge {
+display: inline-flex; align-items: center; gap: 8px;
+border: 1px solid var(--green); border-radius: 20px;
+padding: 4px 14px; font-family: var(--mono); font-size: 10px;
+color: var(--green); margin-bottom: 24px; letter-spacing: 2px;
+}
+.hero h1 {
+font-family: var(--head); font-size: clamp(36px, 10vw, 72px);
+font-weight: 900; line-height: 1;
+margin-bottom: 8px;
+}
+.hero h1 .line2 { color: var(--green); display: block; }
+.hero-sub { color: var(--text); font-size: 15px; margin-bottom: 8px; font-weight: 400; }
+.status-bar {
+display: flex; align-items: center; justify-content: center;
+gap: 20px; flex-wrap: wrap;
+font-family: var(--mono); font-size: 11px; color: var(--text);
+margin: 16px 0;
+}
+.status-bar .s-item { display: flex; align-items: center; gap: 6px; }
+.status-bar .dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot-green { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.dot-red { background: #ef4444; animation: pulse 1.5s infinite; }
+.tasks-counter {
+font-family: var(--mono); font-size: 12px; color: var(--text);
+display: flex; align-items: center; gap: 6px; justify-content: center;
+margin-bottom: 20px;
+}
+.build-interface {
+max-width: 680px; margin: 0 auto 40px;
+border: 1px solid var(--border);
+border-radius: 12px; overflow: hidden;
+background: var(--card);
+}
+.bi-header {
+padding: 10px 16px;
+background: rgba(14,42,74,0.5);
+border-bottom: 1px solid var(--border);
+display: flex; align-items: center; justify-content: space-between;
+font-family: var(--mono); font-size: 10px; color: var(--text);
+letter-spacing: 1px;
+}
+.bi-dots { display: flex; gap: 6px; }
+.bi-dot { width: 10px; height: 10px; border-radius: 50%; }
+.bi-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.bi-tab {
+flex: 1; padding: 10px; text-align: center;
+font-family: var(--mono); font-size: 10px; letter-spacing: 1px;
+cursor: pointer; border: none; background: transparent;
+color: var(--text); transition: all 0.2s;
+display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.bi-tab.active { background: rgba(0,229,255,0.08); color: var(--cyan); }
+.bi-body { padding: 16px; }
+.bi-label { font-family: var(--mono); font-size: 9px; color: var(--text); letter-spacing: 2px; margin-bottom: 8px; }
+textarea.build-input {
+width: 100%; min-height: 100px; padding: 12px;
+background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+border-radius: 8px; color: white; font-family: var(--body);
+font-size: 15px; resize: vertical; outline: none;
+transition: border-color 0.2s;
+}
+textarea.build-input:focus { border-color: var(--cyan); }
+textarea.build-input::placeholder { color: #334155; }
+.bi-footer {
+padding: 12px 16px;
+display: flex; align-items: center; justify-content: space-between;
+border-top: 1px solid var(--border);
+}
+.char-count { font-family: var(--mono); font-size: 10px; color: var(--text); }
+.btn-build {
+padding: 12px 24px; border-radius: 8px;
+background: var(--green); color: var(--dark);
+font-family: var(--mono); font-size: 12px; font-weight: 700;
+letter-spacing: 2px; border: none; cursor: pointer;
+transition: all 0.2s; display: flex; align-items: center; gap: 8px;
+}
+.btn-build:hover { background: #00ff99; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,255,136,0.4); }
+.btn-build:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.pipeline { max-width: 680px; margin: 0 auto 40px; }
+.pipeline-step {
+border: 1px solid var(--border); border-radius: 10px;
+padding: 16px; background: var(--card); margin-bottom: 8px;
+transition: all 0.3s; display: flex; align-items: center; gap: 12px;
+}
+.pipeline-step.running { border-color: var(--cyan); background: rgba(0,229,255,0.05); }
+.pipeline-step.done { border-color: var(--green); background: rgba(0,255,136,0.05); }
+.pipeline-step.error { border-color: #ef4444; }
+.step-icon { font-size: 24px; flex-shrink: 0; }
+.step-info { flex: 1; }
+.step-name { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; margin-bottom: 2px; }
+.step-name.earth { color: var(--green); }
+.step-name.moon { color: #fbbf24; }
+.step-name.sun { color: #fb923c; }
+.step-desc { font-size: 12px; color: var(--text); }
+.step-status {
+font-family: var(--mono); font-size: 10px;
+padding: 3px 8px; border-radius: 4px;
+}
+.step-status.waiting { color: var(--text); }
+.step-status.running { color: var(--cyan); animation: blink 1s infinite; }
+.step-status.done { color: var(--green); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.step-arrow { text-align: center; color: var(--text); font-size: 12px; margin: 4px 0; }
+.terminal {
+background: #000; border: 1px solid var(--border);
+border-radius: 8px; padding: 16px; font-family: var(--mono);
+font-size: 12px; line-height: 1.8; max-height: 320px;
+overflow-y: auto; margin: 0 auto 24px; max-width: 680px;
+display: none;
+}
+.terminal.visible { display: block; }
+.t-green { color: var(--green); }
+.t-cyan { color: var(--cyan); }
+.t-yellow { color: #fbbf24; }
+.t-red { color: #ef4444; }
+.t-gray { color: #475569; }
+.t-white { color: white; }
+.build-result {
+max-width: 680px; margin: 0 auto 40px;
+border: 1px solid var(--green);
+border-radius: 12px; padding: 24px;
+background: rgba(0,255,136,0.05);
+display: none;
+}
+.build-result.visible { display: block; }
+.result-title { font-family: var(--mono); color: var(--green); font-size: 12px; letter-spacing: 2px; margin-bottom: 8px; }
+.result-desc { font-size: 14px; color: var(--text); margin-bottom: 16px; }
+.result-meta { font-family: var(--mono); font-size: 10px; color: #64748b; margin-bottom: 16px; }
+.result-code {
+background: #000; border: 1px solid var(--border);
+border-radius: 8px; padding: 16px;
+font-family: var(--mono); font-size: 11px;
+color: #94a3b8; max-height: 400px; overflow-y: auto;
+white-space: pre-wrap; word-break: break-word;
+margin-bottom: 16px;
+}
+.result-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-action {
+padding: 8px 16px; border-radius: 6px; font-family: var(--mono);
+font-size: 10px; font-weight: 700; letter-spacing: 1px;
+cursor: pointer; border: 1px solid; transition: all 0.2s;
+}
+.btn-copy { border-color: var(--cyan); color: var(--cyan); background: transparent; }
+.btn-copy:hover { background: var(--cyan); color: var(--dark); }
+.btn-new { border-color: var(--green); color: var(--green); background: transparent; }
+.btn-new:hover { background: var(--green); color: var(--dark); }
+.powerup-section {
+background: rgba(14,42,74,0.4); border: 1px solid var(--border);
+border-radius: 12px; padding: 20px;
+}
+.pu-title { font-family: 'Georgia', serif; font-style: italic; font-size: 24px; color: white; margin-bottom: 4px; }
+.pu-sub { color: var(--cyan); font-size: 13px; margin-bottom: 16px; }
+.pu-steps { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.pu-steps h4 { color: var(--cyan); font-size: 13px; margin-bottom: 10px; font-family: var(--body); }
+.pu-step-item { font-size: 13px; color: #94a3b8; margin-bottom: 6px; }
+.pu-step-item strong { color: white; }
+.agents-header {
+padding: 20px;
+display: flex; align-items: center; justify-content: space-between; flex-wrap: gap;
+}
+.agent-filters {
+display: flex; gap: 6px; flex-wrap: wrap; padding: 0 20px 16px;
+}
+.filter-btn {
+padding: 5px 12px; border-radius: 6px; font-family: var(--mono); font-size: 10px;
+cursor: pointer; border: 1px solid var(--border); background: transparent;
+color: var(--text); transition: all 0.2s; letter-spacing: 1px;
+}
+.filter-btn.active { border-color: var(--green); color: var(--green); background: rgba(0,255,136,0.08); }
+.run-all-btn {
+padding: 6px 14px; border-radius: 6px; font-family: var(--mono); font-size: 10px;
+cursor: pointer; border: 1px solid var(--green); background: transparent;
+color: var(--green); display: flex; align-items: center; gap: 6px;
+transition: all 0.2s; letter-spacing: 1px;
+}
+.run-all-btn:hover { background: var(--green); color: var(--dark); }
+.agents-grid { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 8px; }
+.agent-card {
+border: 1px solid var(--border); border-radius: 10px;
+background: var(--card); padding: 16px;
+display: flex; align-items: center; gap: 12px;
+transition: all 0.2s;
+}
+.agent-card:hover { border-color: rgba(0,229,255,0.3); }
+.agent-card.active-agent { border-color: var(--green); background: rgba(0,255,136,0.04); }
+.agent-num { font-family: var(--mono); font-size: 10px; color: #334155; letter-spacing: 1px; }
+.agent-info { flex: 1; }
+.agent-name { font-size: 18px; font-weight: 700; color: white; margin-bottom: 2px; }
+.agent-role {
+font-size: 12px; color: var(--cyan);
+border-left: 2px solid var(--cyan); padding-left: 8px;
+margin-bottom: 4px;
+}
+.agent-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.agent-tag {
+font-family: var(--mono); font-size: 9px; padding: 2px 6px;
+border-radius: 3px; border: 1px solid;
+}
+.tag-core { border-color: #22d3ee; color: #22d3ee; }
+.tag-security { border-color: #a78bfa; color: #a78bfa; }
+.tag-deploy { border-color: #34d399; color: #34d399; }
+.tag-aiml { border-color: #f472b6; color: #f472b6; }
+.tag-network { border-color: #fb923c; color: #fb923c; }
+.agent-indicator { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.ind-online { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.ind-idle { background: #334155; }
+.activate-btn {
+padding: 6px 14px; border-radius: 6px; font-family: var(--mono); font-size: 10px;
+cursor: pointer; border: 1px solid var(--border); background: transparent;
+color: var(--text); transition: all 0.2s; letter-spacing: 1px;
+}
+.activate-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.chat-wrap { display: flex; flex-direction: column; height: calc(100vh - 140px); }
+.chat-hint { padding: 10px 20px; font-size: 12px; color: var(--green); font-family: var(--mono); }
+.chat-messages {
+flex: 1; overflow-y: auto; padding: 16px 20px;
+display: flex; flex-direction: column; gap: 12px;
+}
+.msg { max-width: 85%; }
+.msg.user { align-self: flex-end; }
+.msg.agent { align-self: flex-start; }
+.msg-bubble {
+padding: 10px 14px; border-radius: 10px; font-size: 14px; line-height: 1.5;
+}
+.msg.user .msg-bubble { background: rgba(0,229,255,0.15); border: 1px solid rgba(0,229,255,0.3); }
+.msg.agent .msg-bubble { background: var(--card); border: 1px solid var(--border); }
+.msg-meta { font-family: var(--mono); font-size: 10px; color: var(--text); margin-bottom: 4px; }
+.chat-input-area {
+padding: 12px 20px; border-top: 1px solid var(--border);
+display: flex; gap: 8px; align-items: flex-end;
+}
+.chat-input {
+flex: 1; padding: 10px 14px; background: var(--card);
+border: 1px solid var(--border); border-radius: 8px;
+color: white; font-family: var(--body); font-size: 14px;
+outline: none; resize: none; min-height: 42px; max-height: 120px;
+}
+.chat-input:focus { border-color: var(--cyan); }
+.chat-send {
+padding: 10px 16px; border-radius: 8px;
+background: var(--cyan); color: var(--dark);
+border: none; cursor: pointer; font-family: var(--mono);
+font-size: 11px; font-weight: 700; letter-spacing: 1px;
+transition: all 0.2s; align-self: flex-end;
+}
+.chat-send:hover { background: #00ffff; }
+.chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+.agent-picker {
+display: flex; gap: 6px; padding: 8px 20px;
+overflow-x: auto; border-bottom: 1px solid var(--border);
+scrollbar-width: none;
+}
+.agent-pill {
+padding: 4px 10px; border-radius: 12px; font-family: var(--mono); font-size: 10px;
+cursor: pointer; border: 1px solid var(--border); background: transparent;
+color: var(--text); transition: all 0.2s; white-space: nowrap; letter-spacing: 1px;
+}
+.agent-pill.selected { border-color: var(--green); color: var(--green); background: rgba(0,255,136,0.1); }
+.memoria-wrap { padding: 20px; }
+.mem-title { font-family: var(--head); font-size: 18px; color: var(--purple); margin-bottom: 8px; }
+.mem-sub { color: var(--text); font-size: 13px; margin-bottom: 20px; }
+.mem-entry {
+border: 1px solid var(--border); border-radius: 8px;
+padding: 14px; background: var(--card); margin-bottom: 8px;
+}
+.mem-agent { font-family: var(--mono); font-size: 10px; color: var(--cyan); margin-bottom: 4px; letter-spacing: 1px; }
+.mem-content { font-size: 13px; color: #94a3b8; line-height: 1.5; }
+.mem-time { font-family: var(--mono); font-size: 9px; color: #334155; margin-top: 6px; }
+.mem-empty { text-align: center; padding: 40px; color: #334155; font-family: var(--mono); font-size: 12px; }
+.overview-wrap { padding: 20px; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.stat-card {
+border: 1px solid var(--border); border-radius: 10px;
+padding: 16px; background: var(--card); text-align: center;
+}
+.stat-val { font-family: 'Georgia', serif; font-style: italic; font-size: 32px; margin-bottom: 4px; }
+.stat-val.green { color: var(--green); }
+.stat-val.yellow { color: #fbbf24; }
+.stat-val.cyan { color: var(--cyan); }
+.stat-val.purple { color: var(--purple); }
+.stat-label { font-size: 11px; color: var(--text); }
+.stat-sub { font-family: var(--mono); font-size: 9px; color: #334155; text-decoration: line-through; margin-top: 2px; }
+.pricing-wrap { padding: 0; }
+.pricing-title { font-family: 'Georgia', serif; font-style: italic; font-size: 28px; color: white; text-align: center; margin-bottom: 4px; }
+.pricing-sub { text-align: center; color: var(--text); font-size: 13px; margin-bottom: 20px; }
+.price-card {
+border: 1px solid var(--border); border-radius: 12px;
+padding: 20px; background: var(--card); margin-bottom: 12px;
+position: relative;
+}
+.price-card.featured { border-color: var(--cyan); }
+.price-badge {
+position: absolute; top: -10px; right: 16px;
+background: var(--cyan); color: var(--dark);
+font-family: var(--mono); font-size: 9px; font-weight: 700;
+padding: 2px 8px; border-radius: 4px; letter-spacing: 2px;
+}
+.price-tier { font-family: var(--mono); font-size: 10px; color: var(--green); letter-spacing: 2px; margin-bottom: 8px; }
+.price-amount { font-family: 'Georgia', serif; font-style: italic; font-size: 40px; color: white; margin-bottom: 4px; }
+.price-period { font-size: 12px; color: var(--text); margin-bottom: 16px; }
+.price-features { list-style: none; margin-bottom: 16px; }
+.price-features li { font-size: 13px; color: #94a3b8; padding: 4px 0; }
+.price-features li::before { content: '✓ '; color: var(--green); }
+.price-btn {
+width: 100%; padding: 10px; border-radius: 8px;
+font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 2px;
+cursor: pointer; border: 1px solid; transition: all 0.2s;
+}
+.price-btn.current { border-color: var(--border); color: var(--text); background: transparent; cursor: default; }
+.price-btn.pro { border-color: var(--cyan); color: var(--cyan); background: transparent; }
+.price-btn.pro:hover { background: var(--cyan); color: var(--dark); }
+.price-btn.ent { border-color: var(--green); color: var(--green); background: transparent; }
+.price-btn.ent:hover { background: var(--green); color: var(--dark); }
+.planet-orb { width:42px;height:42px;border-radius:50%;flex-shrink:0;position:relative;overflow:visible;display:flex;align-items:center;justify-content:center; }
+.planet-orb::after{content:'';position:absolute;top:20%;left:20%;width:30%;height:25%;border-radius:50%;background:rgba(255,255,255,0.25);pointer-events:none;}
+.p-earth   {background:radial-gradient(circle at 35% 35%,#4fc3f7,#1565c0 45%,#2e7d32 70%,#1b5e20);box-shadow:0 0 12px rgba(79,195,247,0.4);}
+.p-moon    {background:radial-gradient(circle at 35% 35%,#e0e0e0,#9e9e9e 50%,#616161);box-shadow:0 0 8px rgba(200,200,200,0.2);}
+.p-sun     {background:radial-gradient(circle at 40% 40%,#fff9c4,#ffd600 40%,#ff8f00 70%,#e65100);box-shadow:0 0 22px rgba(255,200,0,0.7);}
+.p-mercury {background:radial-gradient(circle at 35% 35%,#bcaaa4,#8d6e63 50%,#5d4037);box-shadow:0 0 8px rgba(141,110,99,0.3);}
+.p-venus   {background:radial-gradient(circle at 35% 35%,#fff8e1,#ffcc02 40%,#ff8a00 70%,#e65100);box-shadow:0 0 12px rgba(255,200,50,0.4);}
+.p-mars    {background:radial-gradient(circle at 35% 35%,#ff8a65,#e53935 45%,#b71c1c);box-shadow:0 0 12px rgba(229,57,53,0.5);}
+.p-jupiter {background:radial-gradient(circle at 40% 40%,#ffe0b2,#ff9800 30%,#795548 55%,#ffcc80 70%,#ff6f00);box-shadow:0 0 14px rgba(255,152,0,0.4);}
+.p-saturn-wrap{position:relative;width:52px;height:42px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.p-saturn  {background:radial-gradient(circle at 35% 35%,#fff9c4,#ffd54f 40%,#ff8f00);box-shadow:0 0 12px rgba(255,213,79,0.4);width:36px;height:36px;border-radius:50%;position:relative;z-index:1;}
+.p-saturn-ring{position:absolute;width:52px;height:14px;border-radius:50%;border:3px solid rgba(255,213,79,0.55);box-shadow:0 0 6px rgba(255,213,79,0.3);transform:rotateX(65deg);pointer-events:none;z-index:2;}
+.p-uranus  {background:radial-gradient(circle at 35% 35%,#e0f7fa,#00bcd4 50%,#006064);box-shadow:0 0 12px rgba(0,188,212,0.4);}
+.p-neptune {background:radial-gradient(circle at 35% 35%,#7986cb,#1a237e 50%,#0d0d3b);box-shadow:0 0 12px rgba(121,134,203,0.5);}
+.p-cygnus  {background:radial-gradient(circle at 50% 50%,#fff,#81d4fa 30%,#0288d1 60%,#01579b);box-shadow:0 0 16px rgba(2,136,209,0.6);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);border-radius:0;width:44px;height:44px;}
+.p-orion   {background:radial-gradient(circle at 50% 50%,#ffe0b2,#ff7043 40%,#bf360c);box-shadow:0 0 14px rgba(255,112,67,0.6);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);border-radius:0;width:44px;height:44px;}
+.p-andromeda{background:radial-gradient(ellipse at 40% 40%,#f3e5f5,#ce93d8 35%,#7b1fa2 65%,#4a148c);box-shadow:0 0 14px rgba(149,117,205,0.5);border-radius:40% 60% 50% 50%;}
+.p-pleiades{background:radial-gradient(circle at 35% 35%,#e1f5fe,#29b6f6 40%,#0277bd);box-shadow:0 0 10px rgba(41,182,246,0.4);}
+.p-sirius  {background:radial-gradient(circle at 35% 35%,#fff,#e3f2fd 30%,#1565c0);box-shadow:0 0 22px rgba(255,255,255,0.7);}
+.p-canismajor{background:radial-gradient(circle at 35% 35%,#fff8e1,#ffc107 40%,#e65100);box-shadow:0 0 12px rgba(255,193,7,0.5);}
+.p-hydra   {background:radial-gradient(circle at 35% 35%,#e8f5e9,#4caf50 40%,#1b5e20);box-shadow:0 0 10px rgba(76,175,80,0.4);border-radius:30% 70% 60% 40%/40% 30% 70% 60%;}
+.p-lyra    {background:radial-gradient(circle at 35% 35%,#fce4ec,#f06292 40%,#880e4f);box-shadow:0 0 12px rgba(240,98,146,0.4);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);border-radius:0;width:42px;height:42px;}
+.p-cassiopeia{background:radial-gradient(circle at 35% 35%,#f5f5f5,#bdbdbd 50%,#424242);box-shadow:0 0 10px rgba(189,189,189,0.3);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);border-radius:0;width:44px;height:44px;}
+.p-perseus {background:radial-gradient(circle at 35% 35%,#bbdefb,#42a5f5 40%,#0d47a1);box-shadow:0 0 12px rgba(66,165,245,0.4);clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%);border-radius:0;}
+.p-aquila  {background:radial-gradient(circle at 35% 35%,#fff3e0,#ffa726 40%,#bf360c);box-shadow:0 0 10px rgba(255,167,38,0.4);}
+.p-vega    {background:radial-gradient(circle at 35% 35%,#fff,#b3e5fc 30%,#0277bd 60%,#311b92);box-shadow:0 0 16px rgba(179,229,252,0.6);}
+.p-arcturus{background:radial-gradient(circle at 35% 35%,#ffe0b2,#ff7043 40%,#bf360c);box-shadow:0 0 12px rgba(255,112,67,0.4);}
+.p-capella {background:radial-gradient(circle at 35% 35%,#fff8e1,#ffee58 40%,#f9a825);box-shadow:0 0 12px rgba(255,238,88,0.5);}
+.p-rigel   {background:radial-gradient(circle at 35% 35%,#e8eaf6,#7986cb 40%,#283593);box-shadow:0 0 14px rgba(121,134,203,0.5);}
+.p-polaris {background:radial-gradient(circle at 50% 50%,#fff,#f3e5f5 20%,#ce93d8 50%,#6a1b9a);box-shadow:0 0 22px rgba(206,147,216,0.7);}
+.constellation-viewer{margin:20px;border-radius:12px;border:1px solid rgba(0,229,255,0.3);background:linear-gradient(135deg,rgba(0,229,255,0.04),rgba(192,132,252,0.04));overflow:hidden;}
+.cv-header{text-align:center;padding:18px 20px 12px;border-bottom:1px solid rgba(0,229,255,0.15);}
+.cv-title{font-family:var(--head);font-size:15px;font-weight:700;color:var(--cyan);letter-spacing:3px;margin-bottom:6px;}
+.cv-subtitle{font-family:var(--mono);font-size:10px;color:var(--text);letter-spacing:2px;}
+.cv-platforms{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(0,229,255,0.08);}
+.cv-platform{background:var(--card);padding:14px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:background 0.2s;}
+.cv-platform:hover{background:rgba(0,229,255,0.07);}
+.cv-plat-icon{font-size:20px;}
+.cv-plat-name{font-family:var(--mono);font-size:9px;color:#94a3b8;letter-spacing:1px;}
+.cv-plat-status{font-family:var(--mono);font-size:8px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:1px;}
+.cv-status-live{background:rgba(0,255,136,0.15);color:var(--green);border:1px solid rgba(0,255,136,0.3);}
+.cv-status-ready{background:rgba(0,229,255,0.15);color:var(--cyan);border:1px solid rgba(0,229,255,0.3);}
+.cv-status-built{background:rgba(192,132,252,0.15);color:var(--purple);border:1px solid rgba(192,132,252,0.3);}
+.cv-status-active{background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);}
+.cv-status-done{background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.3);}
+.cv-footer-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid rgba(0,229,255,0.1);flex-wrap:wrap;gap:8px;}
+.cv-footer-stats{display:flex;gap:16px;align-items:center;}
+.cv-stat{font-family:var(--mono);font-size:10px;color:var(--text);}
+.cv-stat span{color:var(--cyan);}
+.cv-expand-btn{font-family:var(--mono);font-size:10px;color:var(--cyan);background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);padding:6px 14px;border-radius:6px;cursor:pointer;letter-spacing:1px;transition:all 0.2s;}
+.cv-expand-btn:hover{background:rgba(0,229,255,0.2);}
+.mega-footer{margin-top:60px;border-top:1px solid rgba(0,229,255,0.2);background:rgba(2,6,15,0.95);}
+.footer-nav{display:flex;overflow-x:auto;gap:0;border-bottom:1px solid var(--border);scrollbar-width:none;}
+.footer-nav::-webkit-scrollbar{display:none;}
+.footer-nav-item{padding:12px 14px;font-family:var(--mono);font-size:10px;color:var(--text);cursor:pointer;white-space:nowrap;border-right:1px solid var(--border);transition:all 0.2s;letter-spacing:1px;text-decoration:none;display:block;}
+.footer-nav-item:hover{color:var(--cyan);background:rgba(0,229,255,0.05);}
+.footer-section{padding:24px 20px;border-bottom:1px solid var(--border);scroll-margin-top:120px;}
+.footer-section-title{font-family:var(--head);font-size:12px;font-weight:700;color:var(--cyan);letter-spacing:2px;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.footer-deploy-grid{display:flex;flex-direction:column;gap:12px;}
+.footer-deploy-card{background:rgba(10,22,40,0.8);border:1px solid var(--border);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:6px;}
+.fdc-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.fdc-icon{font-size:18px;flex-shrink:0;}
+.fdc-name{font-family:var(--mono);font-size:11px;color:white;font-weight:700;flex:1;}
+.fdc-badge{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;letter-spacing:1px;flex-shrink:0;}
+.badge-live{background:rgba(0,255,136,0.2);color:var(--green);border:1px solid rgba(0,255,136,0.4);}
+.badge-private{background:rgba(251,191,36,0.2);color:#fbbf24;border:1px solid rgba(251,191,36,0.4);}
+.badge-published{background:rgba(0,229,255,0.2);color:var(--cyan);border:1px solid rgba(0,229,255,0.4);}
+.badge-built{background:rgba(192,132,252,0.2);color:var(--purple);border:1px solid rgba(192,132,252,0.4);}
+.fdc-desc{font-family:var(--body);font-size:12px;color:var(--text);line-height:1.5;}
+.fdc-link{font-family:var(--mono);font-size:10px;color:var(--cyan);text-decoration:none;word-break:break-all;}
+.fdc-link:hover{text-decoration:underline;}
+.fdc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.fdc-tag{font-family:var(--mono);font-size:9px;color:var(--text);background:rgba(255,255,255,0.05);padding:2px 6px;border-radius:4px;border:1px solid rgba(255,255,255,0.1);}
+.footer-agent-table{width:100%;border-collapse:collapse;font-size:11px;}
+.footer-agent-table th{font-family:var(--mono);font-size:9px;color:var(--text);text-align:left;padding:6px 8px;letter-spacing:1px;border-bottom:1px solid var(--border);}
+.footer-agent-table td{padding:6px 8px;border-bottom:1px solid rgba(14,42,74,0.5);font-family:var(--mono);font-size:10px;vertical-align:middle;}
+.footer-agent-table tr:hover td{background:rgba(0,229,255,0.03);}
+.fat-num{color:var(--text);}
+.fat-name{color:white;font-weight:700;}
+.fat-port{color:var(--cyan);}
+.fat-role{color:#94a3b8;font-size:9px;}
+.fat-cluster{font-size:9px;padding:1px 6px;border-radius:4px;border:1px solid;}
+.cluster-scaffold{color:#4ade80;border-color:rgba(74,222,128,0.3);}
+.cluster-security{color:#f87171;border-color:rgba(248,113,113,0.3);}
+.cluster-deploy{color:#60a5fa;border-color:rgba(96,165,250,0.3);}
+.cluster-runtime{color:var(--cyan);border-color:rgba(0,229,255,0.3);}
+.cluster-monitor{color:#fbbf24;border-color:rgba(251,191,36,0.3);}
+.cluster-orchestration{color:var(--purple);border-color:rgba(192,132,252,0.3);}
+.fat-status{color:var(--green);font-size:9px;}
+.footer-github-card{background:rgba(10,22,40,0.8);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;}
+.fgc-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.fgc-name{font-family:var(--mono);font-size:11px;color:white;font-weight:700;}
+.fgc-desc{font-family:var(--body);font-size:11px;color:var(--text);margin-top:2px;}
+.fgc-link{font-family:var(--mono);font-size:10px;color:var(--cyan);text-decoration:none;display:block;margin-top:4px;}
+.footer-gamma-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.footer-gamma-card{background:rgba(10,22,40,0.6);border:1px solid rgba(192,132,252,0.2);border-radius:6px;padding:10px;}
+.fgam-cat{font-family:var(--mono);font-size:8px;color:var(--purple);letter-spacing:1px;margin-bottom:4px;}
+.fgam-name{font-family:var(--body);font-size:11px;color:white;font-weight:600;margin-bottom:4px;}
+.fgam-link{font-family:var(--mono);font-size:9px;color:var(--cyan);text-decoration:none;word-break:break-all;display:block;}
+.footer-product-card{background:rgba(10,22,40,0.8);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px;}
+.fpc-top{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;}
+.fpc-icon{font-size:20px;flex-shrink:0;}
+.fpc-name{font-family:var(--head);font-size:12px;color:white;font-weight:700;}
+.fpc-tagline{font-family:var(--body);font-size:11px;color:var(--cyan);margin-top:2px;}
+.fpc-desc{font-family:var(--body);font-size:12px;color:var(--text);line-height:1.5;margin-bottom:8px;}
+.fpc-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.footer-timeline{display:flex;flex-direction:column;gap:0;}
+.footer-tl-item{display:flex;gap:14px;padding-bottom:20px;position:relative;}
+.footer-tl-item:not(:last-child)::before{content:'';position:absolute;left:19px;top:32px;width:2px;bottom:0;background:linear-gradient(to bottom,var(--cyan),transparent);}
+.tl-year{width:40px;height:40px;border-radius:50%;background:rgba(0,229,255,0.1);border:1px solid var(--cyan);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:8px;color:var(--cyan);flex-shrink:0;text-align:center;line-height:1.2;}
+.tl-content{flex:1;}
+.tl-label{font-family:var(--head);font-size:11px;color:var(--cyan);letter-spacing:1px;margin-bottom:4px;}
+.tl-desc{font-family:var(--body);font-size:12px;color:var(--text);line-height:1.5;}
+.footer-ccpa-card{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:16px;}
+.footer-ccpa-title{font-family:var(--head);font-size:12px;color:#ef4444;letter-spacing:2px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.ccpa-row{display:flex;gap:10px;margin-bottom:8px;}
+.ccpa-key{font-family:var(--mono);font-size:10px;color:var(--text);min-width:130px;flex-shrink:0;}
+.ccpa-val{font-family:var(--mono);font-size:10px;color:white;}
+.footer-fs-card{background:rgba(10,22,40,0.8);border:1px solid var(--border);border-radius:6px;padding:12px;font-family:var(--mono);margin-bottom:10px;}
+.ffs-path{font-size:11px;color:var(--cyan);margin-bottom:4px;}
+.ffs-desc{font-size:10px;color:var(--text);}
+.footer-seed-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.footer-seed-stat{background:rgba(10,22,40,0.8);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;}
+.fss-val{font-family:var(--head);font-size:18px;color:var(--cyan);margin-bottom:4px;}
+.fss-label{font-family:var(--mono);font-size:9px;color:var(--text);letter-spacing:1px;}
+.footer-diff-table{width:100%;border-collapse:collapse;margin-top:12px;}
+.footer-diff-table th,.footer-diff-table td{padding:8px;border:1px solid var(--border);font-family:var(--mono);font-size:10px;text-align:center;}
+.footer-diff-table th{color:var(--text);background:rgba(10,22,40,0.8);}
+.footer-diff-table td:first-child{text-align:left;color:white;}
+.diff-check{color:var(--green);}
+.diff-cross{color:#ef4444;}
+.footer-bottom{padding:20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center;}
+.footer-sha{font-family:var(--mono);font-size:9px;color:var(--text);letter-spacing:1px;word-break:break-all;}
+.footer-sha span{color:var(--cyan);}
+.footer-copy{font-family:var(--mono);font-size:9px;color:#475569;}
+.stats-strip{display:flex;overflow-x:auto;gap:0;border-bottom:1px solid var(--border);scrollbar-width:none;background:rgba(0,229,255,0.02);}
+.stats-strip::-webkit-scrollbar{display:none;}
+.strip-stat{padding:10px 16px;text-align:center;border-right:1px solid var(--border);flex-shrink:0;}
+.strip-val{font-family:var(--head);font-size:14px;color:var(--cyan);}
+.strip-label{font-family:var(--mono);font-size:8px;color:var(--text);letter-spacing:1px;margin-top:2px;}
+.swarm-float {
+position: fixed; bottom: 20px; right: 20px; z-index: 200;
+padding: 12px 20px; border-radius: 10px;
+background: var(--green); color: var(--dark);
+font-family: var(--mono); font-size: 11px; font-weight: 700;
+letter-spacing: 2px; cursor: pointer; border: none;
+display: flex; align-items: center; gap: 8px;
+box-shadow: 0 4px 24px rgba(0,255,136,0.4);
+transition: all 0.2s;
+}
+.swarm-float:hover { background: #00ff99; transform: translateY(-2px); }
+.typing { display: inline-flex; gap: 4px; align-items: center; padding: 4px 0; }
+.typing span {
+width: 6px; height: 6px; background: var(--cyan);
+border-radius: 50%; animation: bounce 1.2s infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.output-section { max-width: 680px; margin: 0 auto 20px; }
+.agent-response-block {
+border-left: 3px solid var(--green);
+padding: 12px 16px; background: rgba(0,255,136,0.04);
+border-radius: 0 8px 8px 0; margin-bottom: 8px;
+font-size: 13px; line-height: 1.7; color: #cbd5e1;
+}
+.agent-response-block.moon { border-color: #fbbf24; background: rgba(251,191,36,0.04); }
+.agent-response-block.sun { border-color: #fb923c; background: rgba(251,146,60,0.04); }
+.arb-label { font-family: var(--mono); font-size: 10px; margin-bottom: 8px; letter-spacing: 2px; }
+.arb-label.earth { color: var(--green); }
+.arb-label.moon { color: #fbbf24; }
+.arb-label.sun { color: #fb923c; }
+</style>
 </head>
 <body>
-    <h1>⚡ master</h1>
-    <p>Sovereign Build Deployed via Constellation25 Agents</p>
-    <div class="badge">Powered by Banani AI & CyGeL</div>
-    <br><br>
-    <a href="#">Access Application Interface</a>
-    <footer>© 2024 CyGeL White • FacePrintPay Ecosystem • Localhost Sovereignty</footer>
+<div id="stars"></div>
+<nav>
+<div class="nav-brand">
+<span>C25</span><span>GAMMA</span><span>v2.0</span>
+</div>
+<div class="nav-right">
+<button class="btn-nav btn-swarm" onclick="showPanel('agents')">⚡ SWARM</button>
+<button class="btn-nav btn-offline" id="statusBtn">
+<span class="pulse"></span> OFFLINE
+</button>
+</div>
+</nav>
+<div class="tab-bar">
+<button class="tab active" onclick="showPanel('build')" id="tab-build">🪐 AGENTS</button>
+<button class="tab" onclick="showPanel('chat')" id="tab-chat">💬 CHAT</button>
+<button class="tab" onclick="showPanel('memoria')" id="tab-memoria">🧠 MEMORIA</button>
+<button class="tab" onclick="showPanel('overview')" id="tab-overview">📊 OVERVIEW</button>
+</div>
+<div class="panel active" id="panel-build">
+<div class="hero">
+<div class="hero-badge">⚡ ENTERPRISE READY · v2.0 · 25 AGENTS</div>
+<h1>DESCRIBE IT.<span class="line2">WE BUILD IT.</span></h1>
+<p class="hero-sub">Earth scaffolds. Moon validates. Sun optimizes.<br>Your app goes live in minutes.</p>
+<div class="status-bar">
+<div class="s-item"><span class="dot dot-green"></span> SWARM ONLINE</div>
+<div class="s-item">25/25 AGENTS</div>
+<div class="s-item" id="latencyDisplay">LATENCY: —</div>
+</div>
+<div class="tasks-counter"><span class="dot dot-red"></span> TASKS: <span id="taskCount">0</span></div>
+</div>
+<div class="build-interface">
+<div class="bi-header">
+<div class="bi-dots">
+<div class="bi-dot" style="background:#ef4444"></div>
+<div class="bi-dot" style="background:#fbbf24"></div>
+<div class="bi-dot" style="background:#22c55e"></div>
+</div>
+<span>CONSTELLATION25 // BUILD INTERFACE</span>
+<span style="color:var(--green)">— AGENTS ONLINE</span>
+</div>
+<div class="bi-tabs">
+<button class="bi-tab active" id="btab-scratch" onclick="switchBiTab('scratch')">✦ BUILD FROM SCRATCH</button>
+<button class="bi-tab" id="btab-powerup" onclick="switchBiTab('powerup')">⚡ MANUS POWER-UP</button>
+</div>
+<div id="bitab-scratch">
+<div class="bi-body">
+<div class="bi-label">DESCRIBE YOUR APPLICATION</div>
+<textarea class="build-input" id="buildPrompt" placeholder="e.g. Build a real-time chat app with user authentication, rooms, and message history..." oninput="updateCharCount()"></textarea>
+</div>
+<div class="bi-footer">
+<span class="char-count"><span id="charCount">0</span> chars</span>
+<button class="btn-build" id="buildBtn" onclick="startBuild()">⚡ BUILD WITH C25</button>
+</div>
+</div>
+<div id="bitab-powerup" style="display:none">
+<div class="bi-body">
+<div class="powerup-section">
+<div class="pu-title">POWER-UP</div>
+<div class="pu-sub">Transform your Manus artifacts into production-grade applications</div>
+<div class="pu-steps">
+<h4>How it works:</h4>
+<div class="pu-step-item">1. Paste your Manus artifact code below</div>
+<div class="pu-step-item">2. <strong>Earth Agent</strong> scaffolds production architecture</div>
+<div class="pu-step-item">3. <strong>Moon Agent</strong> fixes and validates everything</div>
+<div class="pu-step-item">4. <strong>Sun Agent</strong> optimizes for performance</div>
+<div class="pu-step-item">5. Get a production-ready application</div>
+</div>
+<div class="bi-label">Paste Your Manus Artifact</div>
+<textarea class="build-input" id="powerupInput" placeholder="Paste your HTML, React, Vue, or any code from Manus here..." style="min-height:140px"></textarea>
+<p style="font-family:var(--mono);font-size:9px;color:var(--text);margin-top:6px">Supports HTML, React, Vue, Next.js, and any web framework</p>
+</div>
+</div>
+<div class="bi-footer">
+<span></span>
+<button class="btn-build" onclick="startPowerUp()">✦ Power Up with Constellation25</button>
+</div>
+</div>
+</div>
+<div class="pipeline" id="pipeline" style="display:none">
+<div class="pipeline-step" id="step-earth">
+<div class="step-icon">🌍</div>
+<div class="step-info">
+<div class="step-name earth">EARTH</div>
+<div class="step-desc">Scaffolds production architecture</div>
+</div>
+<div class="step-status waiting" id="status-earth">WAITING</div>
+</div>
+<div class="step-arrow">↓</div>
+<div class="pipeline-step" id="step-moon">
+<div class="step-icon">🌙</div>
+<div class="step-info">
+<div class="step-name moon">MOON</div>
+<div class="step-desc">Fixes and validates everything</div>
+</div>
+<div class="step-status waiting" id="status-moon">WAITING</div>
+</div>
+<div class="step-arrow">↓</div>
+<div class="pipeline-step" id="step-sun">
+<div class="step-icon">☀️</div>
+<div class="step-info">
+<div class="step-name sun">SUN</div>
+<div class="step-desc">Optimizes for performance</div>
+</div>
+<div class="step-status waiting" id="status-sun">WAITING</div>
+</div>
+</div>
+<div class="terminal" id="terminal"></div>
+<div class="output-section" id="outputSection" style="display:none">
+<div class="agent-response-block" id="earthOutput" style="display:none">
+<div class="arb-label earth" id="earthLabel">🌍 EARTH — SCAFFOLD</div>
+<div id="earthContent"></div>
+</div>
+<div class="agent-response-block moon" id="moonOutput" style="display:none">
+<div class="arb-label moon">🌙 MOON — VALIDATION</div>
+<div id="moonContent"></div>
+</div>
+<div class="agent-response-block sun" id="sunOutput" style="display:none">
+<div class="arb-label sun">☀️ SUN — OPTIMIZATION</div>
+<div id="sunContent"></div>
+</div>
+</div>
+<div class="build-result" id="buildResult">
+<div class="result-title">✓ PRODUCTION BUILD COMPLETE</div>
+<div class="result-desc">Application built from your description</div>
+<div class="result-meta" id="resultMeta"></div>
+<div class="result-code" id="resultCode"></div>
+<div class="result-actions">
+<button class="btn-action btn-copy" onclick="copyResult()">📋 COPY CODE</button>
+<button class="btn-action btn-new" onclick="resetBuild()">↺ BUILD ANOTHER</button>
+</div>
+</div>
+</div>
+<div class="constellation-viewer" id="constellationViewer" style="display:none">
+<div class="cv-header">
+<div class="cv-title">🪐 VIEW MY CONSTELLATION 🪐</div>
+<div class="cv-subtitle">ALL PLATFORMS · ALL OUTPUTS · MISSION COMPLETE</div>
+</div>
+<div class="cv-platforms">
+<div class="cv-platform" onclick="window.open('https://github.com/Constillation25/constellation25','_blank')">
+<div class="cv-plat-icon">🐙</div>
+<div class="cv-plat-name">GitHub</div>
+<div class="cv-plat-status cv-status-live">● PUSHED</div>
+</div>
+<div class="cv-platform" onclick="window.open('https://cleanbuildfresh.vercel.app/','_blank')">
+<div class="cv-plat-icon">▲</div>
+<div class="cv-plat-name">Vercel</div>
+<div class="cv-plat-status cv-status-live">● LIVE</div>
+</div>
+<div class="cv-platform" onclick="window.open('https://gamma.app/docs/CONSTELLATION-25-jmzkxe9rli390go','_blank')">
+<div class="cv-plat-icon">🎯</div>
+<div class="cv-plat-name">Gamma</div>
+<div class="cv-plat-status cv-status-built">● BUILT</div>
+</div>
+<div class="cv-platform" onclick="window.open('https://replit.com/@MrGGTP/Constillation25','_blank')">
+<div class="cv-plat-icon">🔁</div>
+<div class="cv-plat-name">Replit</div>
+<div class="cv-plat-status cv-status-ready">● READY</div>
+</div>
+<div class="cv-platform" onclick="window.open('https://sovereign-plum.vercel.app','_blank')">
+<div class="cv-plat-icon">🤖</div>
+<div class="cv-plat-name">SovereignGTP</div>
+<div class="cv-plat-status cv-status-active">● ACTIVE</div>
+</div>
+<div class="cv-platform">
+<div class="cv-plat-icon">📱</div>
+<div class="cv-plat-name">Termux</div>
+<div class="cv-plat-status cv-status-done">● DONE</div>
+</div>
+</div>
+<div class="cv-footer-bar">
+<div style="font-family:var(--mono);font-size:10px;color:var(--green);font-weight:700;">✓ CONSTELLATION COMPLETE</div>
+<div class="cv-footer-stats">
+<div class="cv-stat">⚡ <span id="cvAgentCount">3</span> agents</div>
+<div class="cv-stat">🌐 <span>6</span> platforms</div>
+<div class="cv-stat">🕐 <span id="cvBuildTime">—</span></div>
+</div>
+<button class="cv-expand-btn" onclick="window.open('https://cleanbuildfresh.vercel.app/','_blank')">EXPAND →</button>
+</div>
+</div>
+<div class="panel" id="panel-agents">
+<div class="agents-header">
+<div>
+<div class="hero-badge" style="margin-bottom:8px">CONSTELLATION 25</div>
+<div style="font-family:var(--head);font-size:28px;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent">SOVEREIGN SWARM</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:0 20px 12px;flex-wrap:wrap;gap:8px">
+<div class="agent-filters" style="padding:0">
+<button class="filter-btn active" onclick="filterAgents('all',this)">ALL 25</button>
+<button class="filter-btn" onclick="filterAgents('core',this)">CORE 13</button>
+<button class="filter-btn" onclick="filterAgents('security',this)">SECURITY 3</button>
+<button class="filter-btn" onclick="filterAgents('deploy',this)">DEPLOY 3</button>
+<button class="filter-btn" onclick="filterAgents('aiml',this)">AI/ML 2</button>
+<button class="filter-btn" onclick="filterAgents('network',this)">NETWORK 4</button>
+</div>
+<button class="run-all-btn" onclick="runAllAgents()">⚡ RUN ALL</button>
+</div>
+<div class="agents-grid" id="agentsGrid"></div>
+</div>
+<div class="panel" id="panel-chat">
+<div class="agent-picker" id="agentPicker"></div>
+<p class="chat-hint">Mention an agent name or task keyword — Earth routes automatically</p>
+<div class="chat-messages" id="chatMessages">
+<div class="msg agent">
+<div class="msg-meta">🌍 EARTH — SWARM GATEWAY</div>
+<div class="msg-bubble">Swarm online. 25/25 agents ready.<br>Type a task or agent name to begin.</div>
+</div>
+</div>
+<div class="chat-input-area">
+<textarea class="chat-input" id="chatInput" placeholder="Message the swarm..." rows="1"
+onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
+oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+<button class="chat-send" id="chatSendBtn" onclick="sendChat()">SEND</button>
+</div>
+</div>
+<div class="panel" id="panel-memoria">
+<div class="memoria-wrap">
+<div class="mem-title">MEMORIA</div>
+<div class="mem-sub">Agent memory log — all interactions across the swarm</div>
+<div id="memoriaList">
+<div class="mem-empty">🧠 No memories yet.<br>Start building to populate agent memory.</div>
+</div>
+</div>
+</div>
+<div class="panel" id="panel-overview">
+<div class="overview-wrap">
+<div class="stats-grid">
+<div class="stat-card">
+<div class="stat-val green">~8m</div>
+<div class="stat-label">Time to Production</div>
+<div class="stat-sub">vs 2-4 hrs manual</div>
+</div>
+<div class="stat-card">
+<div class="stat-val yellow">$199</div>
+<div class="stat-label">Pro User /month</div>
+</div>
+<div class="stat-card">
+<div class="stat-val cyan">6.3%</div>
+<div class="stat-label">Paid Conversion Rate</div>
+</div>
+<div class="stat-card">
+<div class="stat-val purple">45%</div>
+<div class="stat-label">Repeat Build Rate</div>
+</div>
+</div>
+<div class="pricing-wrap" style="padding:0">
+<div class="pricing-title">PRICING</div>
+<div class="pricing-sub">Choose the perfect plan for your Power-Up needs</div>
+<div class="price-card">
+<div class="price-tier">FREE</div>
+<div class="price-amount">$0</div>
+<div class="price-period">Forever free</div>
+<ul class="price-features">
+<li>3 Power-Ups per month</li>
+<li>Basic agent processing</li>
+<li>Community support</li>
+<li>Public GitHub repos</li>
+</ul>
+<button class="price-btn current">Current Plan</button>
+</div>
+<div class="price-card featured">
+<div class="price-badge">POPULAR</div>
+<div class="price-tier" style="color:var(--cyan)">⚡ PRO</div>
+<div class="price-amount">$199</div>
+<div class="price-period">per month</div>
+<ul class="price-features">
+<li>Unlimited Power-Ups</li>
+<li>Priority agent processing</li>
+<li>Private GitHub repos</li>
+<li>Custom Vercel domains</li>
+<li>Full 25-agent swarm</li>
+</ul>
+<button class="price-btn pro">Upgrade to Pro</button>
+</div>
+<div class="price-card">
+<div class="price-tier">ENTERPRISE</div>
+<div class="price-amount" style="color:var(--cyan)">$2,999</div>
+<div class="price-period">per month</div>
+<ul class="price-features">
+<li>Dedicated agent swarm</li>
+<li>Self-hosted deploy</li>
+<li>SLA guarantees</li>
+<li>Custom integrations</li>
+<li>White-label options</li>
+<li>Dedicated support</li>
+</ul>
+<button class="price-btn ent">Contact Sales</button>
+</div>
+</div>
+</div>
+</div>
+<button class="swarm-float" onclick="showPanel('agents')">🪐 SWARM CONTROL</button>
+<script>
+(function(){
+const c=document.getElementById('stars');
+for(let i=0;i<120;i++){
+const s=document.createElement('div');
+s.className='star';
+s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;
+--d:${2+Math.random()*4}s;--delay:${Math.random()*4}s;--o:${0.2+Math.random()*0.7}`;
+c.appendChild(s);
+}
+})();
+let taskCount = 0;
+let memoria = [];
+let selectedAgent = 'Earth';
+let chatHistory = [];
+let currentBuildResult = '';
+const PLANET_CLASS = {
+Earth:'p-earth', Moon:'p-moon', Sun:'p-sun', Mercury:'p-mercury',
+Venus:'p-venus', Mars:'p-mars', Jupiter:'p-jupiter', Saturn:'p-saturn',
+Uranus:'p-uranus', Neptune:'p-neptune', Cygnus:'p-cygnus', Orion:'p-orion',
+Andromeda:'p-andromeda', Pleiades:'p-pleiades', Sirius:'p-sirius',
+CanisMajor:'p-canismajor', Hydra:'p-hydra', Lyra:'p-lyra',
+Cassiopeia:'p-cassiopeia', Perseus:'p-perseus', Aquila:'p-aquila',
+Vega:'p-vega', Arcturus:'p-arcturus', Capella:'p-capella', Rigel:'p-rigel',
+Polaris:'p-polaris'
+};
+function planetOrb(name) {
+const cls = PLANET_CLASS[name] || 'p-polaris';
+if (name === 'Saturn') {
+return `<div class="p-saturn-wrap"><div class="p-saturn"></div><div class="p-saturn-ring"></div></div>`;
+}
+return `<div class="planet-orb ${cls}"></div>`;
+}
+const AGENTS = [
+{id:1, name:'Earth',      role:'Foundational Code Structure',          tags:['core'],              emoji:'🌍'},
+{id:2, name:'Moon',       role:'Validation & Bug Detection',           tags:['core'],              emoji:'🌙'},
+{id:3, name:'Sun',        role:'Performance & Optimization',           tags:['core','aiml'],       emoji:'☀️'},
+{id:4, name:'Mercury',    role:'Fast Routing & Task Dispatch',         tags:['core','network'],    emoji:'⚡'},
+{id:5, name:'Venus',      role:'Creative UI/UX & Design Systems',      tags:['core'],              emoji:'💫'},
+{id:6, name:'Mars',       role:'Engineering & Deployment Execution',   tags:['core','deploy'],     emoji:'🔴'},
+{id:7, name:'Jupiter',    role:'Large-Scale Orchestration & APIs',     tags:['core','network'],    emoji:'🪐'},
+{id:8, name:'Saturn',     role:'Data Integrity & Schema Management',   tags:['core'],              emoji:'💍'},
+{id:9, name:'Uranus',     role:'Experimental Builds & R&D',            tags:['core','aiml'],       emoji:'🔵'},
+{id:10,name:'Neptune',    role:'Contract Review & Compliance',         tags:['core','security'],   emoji:'🌊'},
+{id:11,name:'Cygnus',     role:'Pattern Recognition & Cross-Agent',    tags:['core'],              emoji:'🦢'},
+{id:12,name:'Orion',      role:'Content & Title Generation',           tags:['core'],              emoji:'⭐'},
+{id:13,name:'Andromeda',  role:'Creative Media & Storytelling',        tags:['core'],              emoji:'🌌'},
+{id:14,name:'Pleiades',   role:'Distributed Coordination',             tags:['network'],           emoji:'✨'},
+{id:15,name:'Sirius',     role:'Advanced Engineering & CI/CD',         tags:['deploy'],            emoji:'💠'},
+{id:16,name:'CanisMajor', role:'Sovereignty Enforcement',              tags:['security'],          emoji:'🛡️'},
+{id:17,name:'Hydra',      role:'Data Pipelines & Storage',             tags:['network'],           emoji:'🐉'},
+{id:18,name:'Lyra',       role:'Audio & Media Processing',             tags:['aiml'],              emoji:'🎵'},
+{id:19,name:'Cassiopeia', role:'Monitoring & Observability',           tags:['core'],              emoji:'👁️'},
+{id:20,name:'Perseus',    role:'Security Auditing & Pen Test',         tags:['security'],          emoji:'🗡️'},
+{id:21,name:'Aquila',     role:'Real-Time Streaming & Events',         tags:['network'],           emoji:'🦅'},
+{id:22,name:'Vega',       role:'ML Model Management',                  tags:['aiml'],              emoji:'🔮'},
+{id:23,name:'Arcturus',   role:'Database Architecture',                tags:['core'],              emoji:'🗄️'},
+{id:24,name:'Capella',    role:'DevOps & Infrastructure',              tags:['deploy'],            emoji:'⚙️'},
+{id:25,name:'Rigel',      role:'Frontend Build & Bundle',              tags:['deploy'],            emoji:'🏗️'},
+];
+const AGENT_PROMPTS = {
+Earth: `You are Earth, the foundational scaffolding agent of Constellation-25. You architect complete, production-ready application structures. When given a description, output a comprehensive technical scaffold including: architecture overview, file structure, key code files (HTML/CSS/JS or React), dependencies, and setup instructions. Be thorough and production-ready. No placeholders.`,
+Moon: `You are Moon, the validation and debugging agent of Constellation-25. You review code for bugs, security issues, logic errors, and improvements. Output: identified issues, fixes applied, validation summary, and the corrected/improved code. Be precise and thorough.`,
+Sun: `You are Sun, the performance optimization agent of Constellation-25. You take working code and maximize its performance, applying: lazy loading, code splitting, caching strategies, bundle optimization, accessibility, and SEO. Output optimization report and the optimized final code.`,
+Mercury: `You are Mercury, the fast routing agent of Constellation-25. You analyze tasks, route them to the right agents, and provide quick, precise responses. Be fast, decisive, and structured in your outputs.`,
+Venus: `You are Venus, the creative UI/UX agent of Constellation-25. You design beautiful, functional interfaces. Think in design systems, color theory, typography, and user flows. Output creative, polished UI solutions.`,
+Mars: `You are Mars, the engineering execution agent of Constellation-25. You write battle-tested, production-grade code. Aggressive in quality, precise in execution. No shortcuts, no half-measures.`,
+Jupiter: `You are Jupiter, the grand orchestrator of Constellation-25. You coordinate complex multi-agent workflows, manage large-scale operations, and leverage the full technology stack. Think in systems and scale.`,
+Neptune: `You are Neptune, the contract and compliance agent of Constellation-25. You review legal language, ensure GDPR/HIPAA compliance, flag risks, and generate consent receipts. Be thorough and precise.`,
+CanisMajor: `You are CanisMajor, the sovereignty enforcement agent of Constellation-25. You ensure all systems comply with offline-first, operator-controlled, no-vendor-lock-in principles. Flag any sovereignty violations immediately.`,
+Orion: `You are Orion, the content generation agent of Constellation-25. You specialize in compelling titles, hooks, SEO copy, and content metadata. Maximize engagement and click-through rates.`,
+default: `You are a specialized agent in the Constellation-25 sovereign AI swarm built by Cygel White / FacePrintPay. You are expert, autonomous, and sovereign. Respond with deep expertise in your domain. Be thorough, direct, and production-ready in all outputs.`
+};
+async function callClaude(agentName, userMessage, systemOverride) {
+const system = systemOverride || AGENT_PROMPTS[agentName] || AGENT_PROMPTS.default;
+const start = Date.now();
+const res = await fetch('https://api.anthropic.com/v1/messages', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({
+model: 'claude-sonnet-4-20250514',
+max_tokens: 4096,
+system,
+messages: [{ role: 'user', content: userMessage }]
+})
+});
+if (!res.ok) {
+const err = await res.json().catch(() => ({}));
+throw new Error(err.error?.message || `API error ${res.status}`);
+}
+const data = await res.json();
+const latency = Date.now() - start;
+document.getElementById('latencyDisplay').textContent = `LATENCY: ${latency}ms`;
+return data.content.filter(b => b.type === 'text').map(b => b.text).join('\n');
+}
+function updateCharCount() {
+const v = document.getElementById('buildPrompt').value;
+document.getElementById('charCount').textContent = v.length;
+}
+function termLine(html) {
+const t = document.getElementById('terminal');
+t.innerHTML += html + '\n';
+t.scrollTop = t.scrollHeight;
+}
+function setStep(agent, state) {
+const step = document.getElementById(`step-${agent}`);
+const status = document.getElementById(`status-${agent}`);
+step.className = `pipeline-step ${state}`;
+status.className = `step-status ${state}`;
+const labels = { waiting:'WAITING', running:'PROCESSING...', done:'✓ COMPLETE', error:'✗ ERROR' };
+status.textContent = labels[state] || state;
+}
+async function startBuild() {
+const prompt = document.getElementById('buildPrompt').value.trim();
+if (!prompt) return alert('Describe your application first.');
+document.getElementById('buildBtn').disabled = true;
+document.getElementById('pipeline').style.display = 'block';
+const terminal = document.getElementById('terminal');
+terminal.className = 'terminal visible';
+terminal.innerHTML = '';
+document.getElementById('buildResult').classList.remove('visible');
+document.getElementById('outputSection').style.display = 'none';
+document.getElementById('earthOutput').style.display = 'none';
+document.getElementById('moonOutput').style.display = 'none';
+document.getElementById('sunOutput').style.display = 'none';
+taskCount++;
+document.getElementById('taskCount').textContent = taskCount;
+setStep('earth','waiting'); setStep('moon','waiting'); setStep('sun','waiting');
+let earthResult = '', moonResult = '', sunResult = '';
+const t0 = Date.now();
+try {
+setStep('earth','running');
+termLine('<span class="t-green">→ Earth Agent initializing...</span>');
+termLine('<span class="t-gray">  Analyzing requirements: "'+prompt.slice(0,60)+(prompt.length>60?'...':'')+'"</span>');
+termLine('<span class="t-cyan">  Scaffolding production architecture...</span>');
+earthResult = await callClaude('Earth',
+`Build a complete, production-ready application for: "${prompt}"
+Provide: 1) Architecture overview, 2) Complete working code (HTML/CSS/JS in a single file if possible), 3) File structure, 4) Key features implemented. Make it actually work.`
+);
+setStep('earth','done');
+termLine('<span class="t-green">✓ Earth complete — scaffold generated</span>');
+addMemoria('Earth', `Scaffolded: ${prompt.slice(0,80)}`);
+document.getElementById('outputSection').style.display = 'block';
+document.getElementById('earthOutput').style.display = 'block';
+document.getElementById('earthContent').textContent = earthResult.slice(0,400)+'...';
+setStep('moon','running');
+termLine('<span class="t-yellow">→ Moon Agent initializing...</span>');
+termLine('<span class="t-gray">  Running validation suite...</span>');
+termLine('<span class="t-cyan">  Catching bugs, syntax errors, vulnerabilities...</span>');
+moonResult = await callClaude('Moon',
+`Review and improve this code/scaffold for: "${prompt}"
+Original scaffold:
+${earthResult}
+Task: Fix any bugs, security issues, or logic errors. Improve the code quality. Output the corrected, improved version with a brief summary of changes made.`
+);
+setStep('moon','done');
+termLine('<span class="t-green">✓ Moon complete — validated & fixed</span>');
+addMemoria('Moon', `Validated scaffold for: ${prompt.slice(0,60)}`);
+document.getElementById('moonOutput').style.display = 'block';
+document.getElementById('moonContent').textContent = moonResult.slice(0,300)+'...';
+setStep('sun','running');
+termLine('<span class="t-yellow">→ Sun Agent initializing...</span>');
+termLine('<span class="t-gray">  Applying performance optimizations...</span>');
+termLine('<span class="t-cyan">  Code splitting & lazy loading applied</span>');
+termLine('<span class="t-cyan">  Image optimization & CDN config set</span>');
+sunResult = await callClaude('Sun',
+`Optimize this application for maximum performance: "${prompt}"
+Current code:
+${moonResult}
+Task: Apply performance optimizations, improve UX, add any missing features, and produce the final production-ready version. This is the final deliverable — make it exceptional.`
+);
+setStep('sun','done');
+termLine('<span class="t-green">→ Lighthouse score: calculated</span>');
+termLine('<span class="t-green">✓ Sun complete — app is LIVE!</span>');
+const elapsed = ((Date.now()-t0)/1000).toFixed(1);
+termLine(`<span class="t-green">=== BUILD COMPLETE in ${elapsed}s ===</span>`);
+addMemoria('Sun', `Optimized final build for: ${prompt.slice(0,60)}`);
+document.getElementById('sunOutput').style.display = 'block';
+document.getElementById('sunContent').textContent = sunResult.slice(0,300)+'...';
+currentBuildResult = sunResult;
+document.getElementById('resultMeta').textContent =
+`Build time: ${elapsed}s  ·  Agents: Earth + Moon + Sun  ·  Sovereign: true`;
+document.getElementById('resultCode').textContent = sunResult;
+document.getElementById('buildResult').classList.add('visible');
+const cv = document.getElementById('constellationViewer');
+cv.style.display = 'block';
+document.getElementById('cvBuildTime').textContent = elapsed + 's';
+document.getElementById('cvAgentCount').textContent = '3';
+cv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+} catch(err) {
+termLine(`<span class="t-red">✗ ERROR: ${err.message}</span>`);
+if (err.message.includes('credit') || err.message.includes('429')) {
+termLine('<span class="t-yellow">→ Attempting Ollama fallback...</span>');
+termLine('<span class="t-gray">  Connect Ollama at localhost:11434 to enable offline mode</span>');
+}
+setStep('earth','error'); setStep('moon','error'); setStep('sun','error');
+}
+document.getElementById('buildBtn').disabled = false;
+taskCount = Math.max(0, taskCount-1);
+document.getElementById('taskCount').textContent = taskCount;
+}
+async function startPowerUp() {
+const code = document.getElementById('powerupInput').value.trim();
+if (!code) return alert('Paste your Manus artifact code first.');
+document.getElementById('pipeline').style.display = 'block';
+const terminal = document.getElementById('terminal');
+terminal.className = 'terminal visible';
+terminal.innerHTML = '';
+document.getElementById('buildResult').classList.remove('visible');
+setStep('earth','running');
+termLine('<span class="t-green">→ Power-Up initiated — analyzing Manus artifact...</span>');
+try {
+const result = await callClaude('Earth',
+`You are upgrading a Manus artifact to production-grade. Here is the original code:
+${code}
+Task: 1) Analyze what this does, 2) Scaffold proper production architecture around it, 3) Fix any issues, 4) Optimize for performance and production deployment. Return the complete upgraded application.`
+);
+setStep('earth','done');
+setStep('moon','done');
+setStep('sun','done');
+termLine('<span class="t-green">=== POWER-UP COMPLETE ===</span>');
+currentBuildResult = result;
+document.getElementById('resultMeta').textContent = 'Manus artifact upgraded to production grade';
+document.getElementById('resultCode').textContent = result;
+document.getElementById('buildResult').classList.add('visible');
+addMemoria('Earth', 'Manus Power-Up completed');
+} catch(err) {
+termLine(`<span class="t-red">✗ ${err.message}</span>`);
+setStep('earth','error');
+}
+}
+function copyResult() {
+navigator.clipboard.writeText(currentBuildResult).then(() => {
+const btn = document.querySelector('.btn-copy');
+btn.textContent = '✓ COPIED!';
+setTimeout(() => btn.textContent = '📋 COPY CODE', 2000);
+});
+}
+function resetBuild() {
+document.getElementById('buildPrompt').value = '';
+document.getElementById('charCount').textContent = '0';
+document.getElementById('pipeline').style.display = 'none';
+document.getElementById('terminal').className = 'terminal';
+document.getElementById('buildResult').classList.remove('visible');
+document.getElementById('outputSection').style.display = 'none';
+setStep('earth','waiting'); setStep('moon','waiting'); setStep('sun','waiting');
+}
+function switchBiTab(tab) {
+document.getElementById('bitab-scratch').style.display = tab==='scratch' ? 'block' : 'none';
+document.getElementById('bitab-powerup').style.display = tab==='powerup' ? 'block' : 'none';
+document.getElementById('btab-scratch').className = 'bi-tab'+(tab==='scratch'?' active':'');
+document.getElementById('btab-powerup').className = 'bi-tab'+(tab==='powerup'?' active':'');
+}
+function renderAgents(filter='all') {
+const grid = document.getElementById('agentsGrid');
+grid.innerHTML = '';
+const filtered = filter==='all' ? AGENTS : AGENTS.filter(a => a.tags.includes(filter));
+filtered.forEach(agent => {
+const tagHtml = agent.tags.map(t =>
+`<span class="agent-tag tag-${t}">${t.toUpperCase()}</span>`
+).join('');
+grid.innerHTML += `
+<div class="agent-card ${agent.name===selectedAgent?'active-agent':''}" id="ac-${agent.name}">
+<div>
+<div class="agent-num">AGENT-${String(agent.id).padStart(2,'0')}</div>
+<div style="margin-top:4px">${planetOrb(agent.name)}</div>
+</div>
+<div class="agent-info">
+<div class="agent-name">${agent.name}</div>
+<div class="agent-role">${agent.role}</div>
+<div class="agent-tags">${tagHtml}</div>
+</div>
+<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+<div class="agent-indicator ind-online"></div>
+<button class="activate-btn" onclick="activateAgent('${agent.name}')">▶ ACTIVATE</button>
+</div>
+</div>`;
+});
+}
+function filterAgents(filter, btn) {
+document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+btn.classList.add('active');
+renderAgents(filter);
+}
+function activateAgent(name) {
+selectedAgent = name;
+document.querySelectorAll('.agent-pill').forEach(p => {
+p.className = 'agent-pill'+(p.dataset.agent===name?' selected':'');
+});
+showPanel('chat');
+addChatMsg('agent', `${name} agent activated. How can I help?`, name);
+}
+async function runAllAgents() {
+const btn = document.querySelector('.run-all-btn');
+btn.disabled = true; btn.textContent = '⚡ RUNNING...';
+addMemoria('Jupiter', 'RUN ALL initiated — orchestrating full swarm diagnostic');
+try {
+const result = await callClaude('Jupiter',
+'Run a full Constellation-25 swarm diagnostic. Report status of all 25 agents, identify any issues, and provide a swarm health summary. Format as a structured report.',
+AGENT_PROMPTS.Jupiter
+);
+addMemoria('Jupiter', result.slice(0,200));
+showPanel('memoria');
+} catch(e) {
+addMemoria('Jupiter', 'Swarm diagnostic failed: '+e.message);
+}
+btn.disabled = false; btn.textContent = '⚡ RUN ALL';
+}
+function buildAgentPicker() {
+const picker = document.getElementById('agentPicker');
+AGENTS.slice(0,12).forEach(a => {
+const p = document.createElement('button');
+p.className = 'agent-pill'+(a.name===selectedAgent?' selected':'');
+p.dataset.agent = a.name;
+p.innerHTML = planetOrb(a.name)+' '+a.name;
+p.onclick = () => {
+selectedAgent = a.name;
+document.querySelectorAll('.agent-pill').forEach(x => x.classList.remove('selected'));
+p.classList.add('selected');
+};
+picker.appendChild(p);
+});
+}
+function addChatMsg(role, content, agentName) {
+const msgs = document.getElementById('chatMessages');
+const aName = agentName||selectedAgent;
+const meta = role==='user' ? 'YOU' : `${aName} — C25 SWARM`;
+const icon = role==='user' ? '<span style="font-size:16px">👤</span>' : planetOrb(aName);
+msgs.innerHTML += `
+<div class="msg ${role}">
+<div class="msg-meta" style="display:flex;align-items:center;gap:6px">${icon} ${meta}</div>
+<div class="msg-bubble">${content.replace(/\n/g,'<br>')}</div>
+</div>`;
+msgs.scrollTop = msgs.scrollHeight;
+}
+function addTypingIndicator() {
+const msgs = document.getElementById('chatMessages');
+const div = document.createElement('div');
+div.className = 'msg agent'; div.id = 'typingIndicator';
+div.innerHTML = `<div class="msg-meta">🤖 ${selectedAgent} — THINKING</div>
+<div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
+}
+async function sendChat() {
+const input = document.getElementById('chatInput');
+const msg = input.value.trim();
+if (!msg) return;
+const mentionedAgent = AGENTS.find(a =>
+msg.toLowerCase().includes(a.name.toLowerCase())
+);
+if (mentionedAgent) selectedAgent = mentionedAgent.name;
+input.value = ''; input.style.height = 'auto';
+addChatMsg('user', msg);
+chatHistory.push({ role:'user', content: msg });
+const sendBtn = document.getElementById('chatSendBtn');
+sendBtn.disabled = true;
+addTypingIndicator();
+try {
+const system = AGENT_PROMPTS[selectedAgent] || AGENT_PROMPTS.default;
+const messages = [...chatHistory.slice(-8)];
+const res = await fetch('https://api.anthropic.com/v1/messages', {
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body: JSON.stringify({
+model:'claude-sonnet-4-20250514',
+max_tokens:1024,
+system,
+messages
+})
+});
+const data = await res.json();
+const reply = data.content?.filter(b=>b.type==='text').map(b=>b.text).join('\n') || 'No response';
+document.getElementById('typingIndicator')?.remove();
+addChatMsg('agent', reply, selectedAgent);
+chatHistory.push({ role:'assistant', content: reply });
+addMemoria(selectedAgent, reply.slice(0,120)+'...');
+} catch(e) {
+document.getElementById('typingIndicator')?.remove();
+addChatMsg('agent', `Error: ${e.message}`, selectedAgent);
+}
+sendBtn.disabled = false;
+}
+function addMemoria(agentName, content) {
+memoria.unshift({ agent:agentName, content, time: new Date().toLocaleTimeString() });
+const list = document.getElementById('memoriaList');
+if (memoria.length === 1) list.innerHTML = '';
+list.innerHTML = memoria.map(m => `
+<div class="mem-entry">
+<div class="mem-agent">${m.agent.toUpperCase()} — C25 SWARM</div>
+<div class="mem-content">${m.content}</div>
+<div class="mem-time">${m.time}</div>
+</div>`).join('');
+}
+function showPanel(name) {
+const panelMap = { build:'build', agents:'agents', chat:'chat', memoria:'memoria', overview:'overview' };
+document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+const panelId = `panel-${name}`;
+const tabId = `tab-${name==='agents'?'build':name}`;
+document.getElementById(panelId)?.classList.add('active');
+document.getElementById(tabId)?.classList.add('active');
+if (name==='agents') {
+document.getElementById('panel-agents')?.classList.add('active');
+document.getElementById('panel-build')?.classList.remove('active');
+}
+}
+document.getElementById('tab-build').onclick = () => {
+document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+document.getElementById('panel-build').classList.add('active');
+document.getElementById('tab-build').classList.add('active');
+};
+async function pingStatus() {
+const btn = document.getElementById('statusBtn');
+try {
+const start = Date.now();
+await fetch('https://api.anthropic.com/v1/messages', {
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1, messages:[{role:'user',content:'hi'}] })
+});
+const ms = Date.now()-start;
+btn.className = 'btn-nav btn-offline online';
+btn.innerHTML = `<span class="pulse"></span> ONLINE ${ms}ms`;
+document.getElementById('latencyDisplay').textContent = `LATENCY: ${ms}ms`;
+} catch(e) {
+btn.className = 'btn-nav btn-offline';
+btn.innerHTML = `<span class="pulse"></span> OFFLINE`;
+}
+}
+renderAgents();
+buildAgentPicker();
+pingStatus();
+setInterval(pingStatus, 30000);
+</script>
 </body>
 </html>
